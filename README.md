@@ -1,6 +1,5 @@
 # Tic-Tac-Toe Game
 
-## Demo
 https://github.com/Latthaphon2545/Tic-Tac-Toe/assets/108315515/6b62962c-91e8-4ccb-9a79-15583d4cb43f
 
 
