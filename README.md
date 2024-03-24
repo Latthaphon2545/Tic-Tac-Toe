@@ -1,5 +1,9 @@
 # Tic-Tac-Toe Game
 
+## Demo
+https://github.com/Latthaphon2545/Tic-Tac-Toe/assets/108315515/6b62962c-91e8-4ccb-9a79-15583d4cb43f
+
+
 ## About the Game
 This game is "XO" or "tic-tac-toe" played on a 3x3 board. Players take turns placing their symbols ("X" or "O") on empty squares. The first player to place their symbol in 3 squares in a row, column, or diagonal wins.
 
@@ -20,7 +24,7 @@ Note: The game ends when one player scores according to the specified criteria. 
 
 ## Game Features
 ### Gameplay History
-The game records all gameplay data, including players, winners, date, and time.
+The game records all gameplay data, including players, winners, dates, and times.
 Players can view the gameplay history from the main menu.
 
 ### AI
