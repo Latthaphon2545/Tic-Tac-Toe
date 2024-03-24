@@ -44,7 +44,7 @@ Players can use Socket to create game rooms, share room codes, and send move dat
 
 2. **Install Packages**
    - Open a terminal in both the `client` and `server` folders.
-   - Type `npm init` in the terminal of both folders.
+   - Type `npm install` in the terminal of both folders.
 
 3. **Run the Program**
    - In the terminal of the `client` folder, type `npm run dev`.
