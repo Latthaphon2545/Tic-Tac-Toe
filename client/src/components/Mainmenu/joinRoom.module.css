@@ -1,0 +1,106 @@
+.Join {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.Join h2 {
+    text-align: center;
+}
+
+.Join input[type="text"] {
+    padding: 5px;
+    font-size: 16px;
+    width: 200px;
+    color: #000000;
+}
+
+.Join button {
+    cursor: pointer;
+    background: #FFF2DC;
+    font-size: 47px;
+    padding: 10px 20px 10px 20px;
+    text-decoration: none;
+    margin-top: 30px;
+    color: black;
+    border-radius: 20px;
+    box-shadow: 2px 5px 0 #666;
+}
+
+.Join button:hover {
+    box-shadow: none;
+    /* move down */
+    transform: translateY(5px);
+    background-color: #838280;
+}
+
+.Join button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.Join form {
+    position: fixed;
+    top: 75%;
+    left: 85%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #645F5B;
+    padding: 30px;
+    border-radius: 40px;
+}
+
+.Join form button {
+    font-size: 20px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    box-shadow: none;
+    color: #EFEBE9;
+    margin-top: 0px;
+}
+
+.Join form button:hover {
+    text-shadow: 1px 1px 3px #000000;
+    color: #000000;
+    transform: translateY(5px);
+}
+
+.Join a {
+    cursor: pointer;
+    position: fixed;
+    right: 1%;
+    bottom: 0.1%;
+    background-color: #00000000;
+    font-size: 10vh;
+}
+
+.Join a:hover {
+    text-shadow: 1px 1px 3px #000000;
+    color: #000000;
+    transform: translateY(5px);
+}
+
+.findButton{
+    cursor: pointer;
+    position: fixed;
+    right: 1%;
+    bottom: 0.6%;
+    font-size: 10vh;
+}
+
+.findButton button {
+    font-size: 20px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.findButton button:hover {
+    background-color: transparent;
+    transform: translateY(5px);
+}

@@ -1,0 +1,169 @@
+body {
+    background-color: #393735;
+}
+
+* {
+    font-family: "Bebas Neue", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    color: rgb(255, 255, 255);
+}
+
+.Main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.Main h1 {
+    font-size: 15vh;
+    text-align: center;
+    text-shadow: 10px 7px 2px rgb(0, 0, 0);
+    color: #FFF2DC;
+}
+
+.Main input{
+    width: 100%;
+    height: 50px;
+    font-size: 20px;
+    text-align: center;
+    margin: 20px 0;
+    color: black;
+    border-radius: 20px;
+    background-color: #EFEBE9;
+    border: 3px solid #393735;
+}
+
+.historybutton{
+    cursor: pointer;
+    position: fixed;
+    left: 1%;
+    bottom: 2%;
+    background-color: transparent;
+    border: none;
+}
+
+.historybutton:hover{
+    text-shadow: 1px 1px 3px #000000;
+    color: #000000;
+    transform: translateY(5px);
+}
+
+.container {
+    position: fixed;
+    left: 10%;
+    bottom: 10%;
+    width: 80%;
+    height: 80%;
+    background-color: #645F5B;
+    border: none;
+    overflow: auto;
+    border-radius: 40px;
+}
+
+.containerEach{
+    display: flex;
+    justify-content:space-around;
+    padding: 20px;
+    background-color: #efebe96c;
+    width: 70%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    box-shadow: 2px 5px 0 #3d3b3b;
+}
+
+.title {
+    color: #FFF2DC;
+    text-shadow: 6px 7px 2px rgb(0, 0, 0);
+    font-size: 8vh;
+    font-weight: bold;
+    text-align: center;
+}
+
+.game {
+    color: black;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+.detailContain{
+    width: 33%;
+    display: flex;
+    flex-direction: column;
+    color: black;
+    text-align: center;
+    background-color: transparent;
+    font-size: 2vh;
+    text-shadow: 1px 1px 3px #000000;
+    justify-content: center;
+    align-items: center;
+}
+
+.detailContain p{
+    margin: 2%;
+}
+
+.winner {
+    width: 33%;
+    color: #FFF2DC;
+    text-shadow: 1px 1px 3px #000000;
+    font-size: 3vh;
+    font-weight: bold;
+    text-align: center;
+}
+
+.date {
+    display: flex;
+    justify-content: center;
+    margin-top: -70px;
+}
+
+input[type="date"] {
+    cursor: pointer;
+    width: 10%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #645F5B;
+    color: #444;
+    color: #FFF2DC;
+    border: 1px solid #FFF2DC;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+input[type="date"]:hover {
+    border: 1px solid #FFF2DC;
+    background-color: #645F5B;
+}
+
+/* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+    visibility: hidden;
+    /* Hidden by default. Visible on click */
+    min-width: 250px;
+    /* Set a default minimum width */
+    margin-left: -125px;
+    /* Divide value of min-width by 2 */
+    background-color: #333;
+    /* Black background color */
+    color: #fff;
+    /* White text color */
+    text-align: center;
+    /* Centered text */
+    border-radius: 2px;
+    /* Rounded borders */
+    padding: 16px;
+    /* Padding */
+    position: fixed;
+    /* Sit on top of the screen */
+    z-index: 1;
+    /* Add a z-index if needed */
+    left: 50%;
+    /* Center the snackbar */
+    bottom: 30px;
+    /* 30px from the bottom */
+}
