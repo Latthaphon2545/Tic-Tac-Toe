@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { storage } from "../confic/firebase";
 import { ref, uploadBytes } from "firebase/storage";
 
-function ScreenRecorder({ PlayerName }) {
+function ScreenRecorder({ PlayerName, winner }) {
   const [recording, setRecording] = useState(false);
   const [videoUrl, setVideoUrl] = useState(null);
   const mediaRecorder = useRef(null);
@@ -12,8 +12,8 @@ function ScreenRecorder({ PlayerName }) {
 
   const startRecording = async () => {
     if (
-      window.confirm(
-        "Do you want to recording the screen? and save to database?"
+      window.alert(
+        "Recording the screen? and save to database?"
       )
     ) {
       const stream = await navigator.mediaDevices.getDisplayMedia({
@@ -23,12 +23,19 @@ function ScreenRecorder({ PlayerName }) {
       mediaRecorder.current.ondataavailable = handleDataAvailable;
       mediaRecorder.current.start();
       setRecording(true);
+    } else {
+      setShowConfirm(false);
     }
   };
 
   const stopRecording = () => {
-    mediaRecorder.current.stop();
-    setRecording(false);
+    console.log(recording);
+    if (mediaRecorder.current && mediaRecorder.current.state !== "inactive" && recording) {
+      mediaRecorder.current.stop();
+      setRecording(false);
+    }else{
+      return;
+    }
   };
 
   const handleDataAvailable = async (e) => {
@@ -48,27 +55,16 @@ function ScreenRecorder({ PlayerName }) {
   };
 
   useEffect(() => {
-    if (showConfirm) {
-      if (
-        window.confirm(
-          "Do you want to recording the screen? and save to database?"
-        )
-      ) {
-        startRecording();
-        setShowConfirm(false);
-      }
-    }
-  }, [showConfirm]);
+    startRecording();
+    setShowConfirm(false);
+  }, []);
 
-  // if reload page stop recording
   useEffect(() => {
-    window.addEventListener("beforeunload", (e) => {
-      e.preventDefault();
-      if (recording) {
-        stopRecording();
-      }
-    });
-  }, [recording]);
+    console.log(winner);
+    if (winner && recording) {
+      stopRecording();
+    }
+  }, [winner]);
 
   return (
     <div>

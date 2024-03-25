@@ -13,11 +13,10 @@ import InGame from "../Game/gameWithoutAI";
 import classMain from "./main.module.css";
 import InGameWithAI from "../Game/gameWithAI";
 
-import { handleWatchVideo } from "../useTogether/useTogether";
-
-import { db, storage } from "../../confic/firebase";
+import { db } from "../../confic/firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { ref, getDownloadURL } from "firebase/storage";
+
+import HistoryScreen from "./history";
 
 const historyCollection = collection(db, "history");
 
@@ -26,8 +25,7 @@ const Main = () => {
   const [isPlayWithAI, setPlayWithAI] = useState(false);
   const [isHistoryUI, setHistoryUI] = useState(false);
   const [PlayerName, setPlayerName] = useState("");
-  const [isVideoPlay, setisVideoPlay] = useState(false);
-  const [videoUrl, setVideoUrl] = useState(null);
+  const [size, setSize] = useState(3);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const date = new Date();
@@ -134,14 +132,20 @@ const Main = () => {
               placeholder="Enter Name"
               onChange={(e) => setPlayerName(e.target.value || randomName())}
             />
+            <input
+              type="number"
+              placeholder="Enter Board Size"
+              value={size}
+              onChange={(e) => setSize(parseInt(e.target.value))}
+            />
           </>
         )}
         <GameContext.Provider
           value={{ isInRoom, setInRoom, isPlayWithAI, setPlayWithAI }}
         >
-          {!isInRoom & !isPlayWithAI && <JoinRoom disabled={!PlayerName} />}
-          {isInRoom && <InGame PlayerName={PlayerName} />}
-          {isPlayWithAI && <InGameWithAI PlayerName={PlayerName} />}
+          {!isInRoom & !isPlayWithAI && <JoinRoom disabled={!PlayerName} size={size} />}
+          {isInRoom && <InGame PlayerName={PlayerName}/>}
+          {isPlayWithAI && <InGameWithAI PlayerName={PlayerName} size={size} />}
         </GameContext.Provider>
       </div>
       {!isInRoom && !isPlayWithAI && (
@@ -163,85 +167,12 @@ const Main = () => {
         </button>
       )}
       {isHistoryUI && (
-        <div>
-          {history.map((game, index) => (
-            <div className={classMain.container} key={game.id || index}>
-              <h2 className={classMain.title}>History</h2>
-              <div className={classMain.date}>
-                <input
-                  type="date"
-                  onChange={handleDateChange}
-                  value={selectedDate}
-                />
-              </div>
-              {history
-                .filter((game) => {
-                  if (selectedDate) {
-                    const gameDate = new Date(game.date.toDate());
-                    const gameDateString = `${gameDate.getFullYear()}-${String(
-                      gameDate.getMonth() + 1
-                    ).padStart(2, "0")}-${String(gameDate.getDate()).padStart(
-                      2,
-                      "0"
-                    )}`;
-
-                    return gameDateString === selectedDate;
-                  }
-
-                  return true;
-                })
-                .map((game, index) => (
-                  <div
-                    key={game.id || index}
-                    className={classMain.containerEach}
-                  >
-                    <div className={classMain.detailContain}>
-                      <p>{game.player1}</p>
-                      <p
-                        style={{
-                          fontSize: "2.5rem",
-                          fontWeight: "bold",
-                          color: "red",
-                        }}
-                      >
-                        VS
-                      </p>
-                      <p>{game.player2}</p>
-                    </div>
-                    <div className={classMain.winner}>
-                      <p>👑</p>
-                      <p>{game.winner ? `${game.winner}` : "Draw"}</p>
-                      <p>time for play : {game.timeToplay}</p>
-                      {game.player2 === "AI" ? (
-                      <button
-                        onClick={() =>
-                          handleWatchVideo(
-                            game.player1,
-                            game.player2,
-                            setVideoUrl,
-                            setisVideoPlay
-                          )
-                        }
-                      >
-                        Watch Video
-                      </button>
-                    ) : null}
-                      {isVideoPlay ? (
-                        <>
-                          <div className={classMain.videoContainer}>
-                            <video src={videoUrl} controls autoPlay />
-                            <button onClick={() => setisVideoPlay(false)}>
-                              Back
-                            </button>
-                          </div>
-                        </>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          ))}
-        </div>
+        <HistoryScreen
+          history={history}
+          isHistoryUI={isHistoryUI}
+          selectedDate={selectedDate}
+          handleDateChange={handleDateChange}
+        />
       )}
     </div>
   );

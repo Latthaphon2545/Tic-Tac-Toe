@@ -22,6 +22,8 @@ var playerNames = {};
 
 var renderCount = 0;
 
+var sizeTable = 3;
+
 io.on("connection", async (socket) => {
   socket.on("join_game", async (message) => {
     const connectedSockets = io.sockets.adapter.rooms.get(message.roomId);
@@ -41,6 +43,7 @@ io.on("connection", async (socket) => {
       await socket.join(message.roomId);
       socket.emit("join_room_success");
       if (io.sockets.adapter.rooms.get(message.roomId).size === 1) {
+        sizeTable = message.size;
         socket.emit("start_game", {
           strat: true,
           symbol: "X",
@@ -102,8 +105,8 @@ io.on("connection", async (socket) => {
 
     io.to(data.roomId).emit("name_each_room", {
       players: playerNames[data.roomId],
+      size: sizeTable,
     });
-
   });
 });
 

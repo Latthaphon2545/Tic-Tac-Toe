@@ -11,7 +11,7 @@ import classJoin from "./joinRoom.module.css";
 
 import Loupe from "../../img/loupe.png";
 
-function JoinRoom() {
+function JoinRoom({ size }) {
   const [roomId, setRoomId] = useState("");
   const [isJoining, setIsJoining] = useState(false);
   const [showFindRoom, setShowFindRoom] = useState(false);
@@ -51,7 +51,7 @@ function JoinRoom() {
 
   const useTogether = async (socket, id) => {
     try {
-      const joined = await gameService.joinRoom(socket, id);
+      const joined = await gameService.joinRoom(socket, id, size);
 
       if (joined) {
         setInRoom(true);

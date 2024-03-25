@@ -7,8 +7,11 @@ import Alert from "@mui/material/Alert";
 
 import classGame from "./game.module.css";
 
-import { copyToClipboard, checkWinner } from "../useTogether/useTogether";
-import ScreenRecorder from "../../record/vedio";
+import { ShowGameState, checkWinner } from "./inGame";
+import { copyToClipboard } from "../useTogether/copyToClipboard";
+import SnackbarContainer from "../useTogether/Snackbar";
+import BackTomain from "../useTogether/backTomain";
+import HeaderContainer from "../useTogether/header";
 
 const socketServices = new SocketServices();
 const gameService = new GameService();
@@ -28,11 +31,14 @@ const InGame = ({ PlayerName }) => {
 
   const [startTime, setStartTime] = useState(null);
 
-  const [gameState, setGameState] = useState([
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-  ]);
+  const [size, setSize] = useState(3);
+
+  const [gameState, setGameState] = useState(() => {
+    const initialGameState = Array(size)
+      .fill()
+      .map(() => Array(size).fill(""));
+    return initialGameState;
+  });
 
   const [winnerMessage, setWinnerwinnerMessage] = useState("");
   const [winner, setWinner] = useState(null);
@@ -46,7 +52,7 @@ const InGame = ({ PlayerName }) => {
     if (gameState[row][col] === "" && !winner) {
       newGameState[row][col] = player;
       setGameState(newGameState);
-      checkWinner(newGameState, setWinner, setWinnerwinnerMessage);
+      checkWinner(newGameState, setWinner, setWinnerwinnerMessage, size);
 
       const socket = socketServices.getSocket();
       if (socket) {
@@ -60,7 +66,7 @@ const InGame = ({ PlayerName }) => {
     if (socket) {
       gameService.onGameUpdated(socket, (data) => {
         setGameState(data.gameState);
-        checkWinner(data.gameState, setWinner, setWinnerwinnerMessage);
+        checkWinner(data.gameState, setWinner, setWinnerwinnerMessage, size);
         setIsPlayerTurn(!isPlayerTurn);
         setIsOpponentTurn(!isOpponentTurn);
       });
@@ -75,7 +81,9 @@ const InGame = ({ PlayerName }) => {
       setRoomId(data.roomId);
       socket.emit("player_name", { name: playerNames, roomId: data.roomId });
       socket.on("name_each_room", (data) => {
+        console.log(data);
         setListName(data.players);
+        setSize(data.size);
       });
     });
   };
@@ -91,20 +99,20 @@ const InGame = ({ PlayerName }) => {
     setOpenSnackbar(true);
   };
 
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenSnackbar(false);
-    setCopySuccess(false);
-  };
-
   useEffect(() => {
     handleGameStart();
     handleGameUpdate();
     setStartTime(new Date());
   }, []);
+
+  useEffect(() => {
+    setGameState(() => {
+      const initialGameState = Array(size)
+        .fill()
+        .map(() => Array(size).fill(""));
+      return initialGameState;
+    });
+  }, [size]);
 
   useEffect(() => {
     handleGameStart();
@@ -120,64 +128,19 @@ const InGame = ({ PlayerName }) => {
   return (
     <div className={classGame.InGame}>
       <div className={classGame.header}>
-        <div>
-          <h3
-            style={{
-              color: `${isPlayerTurn && player === "X" ? "white" : "gray"}`,
-            }}
-          >
-            X
-          </h3>
-          <p
-            style={{
-              color: `${isPlayerTurn && player === "X" ? "white" : "gray"}`,
-            }}
-          >
-            {listName[0]}
-          </p>
-        </div>
-        <div>
-          <h3
-            style={{
-              color: `${isOpponentTurn && player === "O" ? "white" : "gray"}`,
-            }}
-          >
-            O
-          </h3>
-          <p
-            style={{
-              color: `${isOpponentTurn && player === "O" ? "white" : "gray"}`,
-            }}
-          >
-            {listName[1] ? listName[1] : "Waiting..."}
-          </p>
-        </div>
+        <HeaderContainer
+          name1={listName[0]}
+          name2={listName[1]}
+          isPlayerTurn={isPlayerTurn}
+          isOpponentTurn={isOpponentTurn}
+          player={player}
+        />
       </div>
-      <table>
-        <tbody>
-          {gameState.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {row.map((cell, colIndex) => (
-                <td
-                  key={colIndex}
-                  style={{
-                    border: `6px solid ${
-                      isPlayerTurn ? "white" : "transparent"
-                    }`,
-                  }}
-                >
-                  <input
-                    type="button"
-                    value={cell}
-                    id={`${rowIndex * 3 + colIndex + 1}`}
-                    onClick={(e) => handlePlayerClick(e, rowIndex, colIndex)}
-                  ></input>
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ShowGameState
+        gameState={gameState}
+        handlePlayerClick={handlePlayerClick}
+        isPlayerTurn={isPlayerTurn}
+      />
       <div className={classGame.buttonRoom}>
         {!winner && (
           <>
@@ -192,38 +155,23 @@ const InGame = ({ PlayerName }) => {
       </div>
       {copySuccess && (
         <>
-          <Snackbar open={copySuccess} autoHideDuration={2000}>
-            <Alert
-              severity="success"
-              sx={{ width: "100%", backgroundColor: "black", color: "white" }}
-            >
-              Room ID copied to clipboard
-            </Alert>
-          </Snackbar>
+          <SnackbarContainer
+            title="Room ID copied to clipboard"
+            Duration={2000}
+            open={copySuccess}
+          />
         </>
       )}
-      <Snackbar open={openSnackbar} autoHideDuration={2000}>
-        <Alert
-          severity="success"
-          sx={{ width: "100%", backgroundColor: "black", color: "white" }}
-        >
-          {winnerMessage == "tie"
+      <SnackbarContainer
+        title={
+          winnerMessage == "tie"
             ? "It's a tie"
-            : `${winnerMessage == "O" ? listName[1] : listName[0]} won`}
-        </Alert>
-      </Snackbar>
-      {winner ? (
-        <div>
-          <h3
-            onClick={() => {
-              window.location.href = "/main";
-            }}
-            style={{ color: "white", cursor: "pointer" }}
-          >
-            Back to main menu
-          </h3>
-        </div>
-      ) : null}
+            : `${winnerMessage == "O" ? listName[1] : listName[0]} won`
+        }
+        Duration={2000}
+        open={openSnackbar}
+      />
+      {winner ? <BackTomain /> : null}
     </div>
   );
 };

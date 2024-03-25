@@ -6,16 +6,15 @@ import Alert from "@mui/material/Alert";
 import { db } from "../../confic/firebase";
 import { collection, addDoc } from "firebase/firestore";
 
-import {
-  isBoardFull,
-  checkWinner,
-  formatTime,
-} from "../useTogether/useTogether";
+import { isBoardFull, checkWinner, ShowGameState } from "./inGame";
+import { formatTime } from "../useTogether/fotmatTime";
 
 import classGame from "./game.module.css";
 import ScreenRecorder from "../../record/vedio";
+import HeaderContainer from "../useTogether/header";
+import SnackbarContainer from "../useTogether/Snackbar";
 
-const InGameWithAI = ({ PlayerName }) => {
+const InGameWithAI = ({ PlayerName, size }) => {
   const [player, setPlayer] = useState("X");
   const [opositePlayer, setOpositePlayer] = useState("O");
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
@@ -29,14 +28,22 @@ const InGameWithAI = ({ PlayerName }) => {
 
   const [playerNames, setPlayerNames] = useState(PlayerName);
 
-  const [gameState, setGameState] = useState([
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-  ]);
+  const [gameState, setGameState] = useState(() => {
+    const initialGameState = Array(size)
+      .fill()
+      .map(() => Array(size).fill(""));
+    return initialGameState;
+  });
 
-  const minimax = (board, depth, isMaximizingPlayer) => {
-    let winner = checkWinner(board, setWinner, setWinnerwinnerMessage);
+  const minimax = (board, depth, alpha, beta, isMaximizingPlayer, size, startTime) => {
+
+    if(new Date() - startTime > 5000){
+      return 0;
+    }
+
+
+    let winner = checkWinner(board, setWinner, setWinnerwinnerMessage, size);
+    
 
     if (winner !== null) {
       if (winner === opositePlayer) {
@@ -50,26 +57,34 @@ const InGameWithAI = ({ PlayerName }) => {
 
     if (isMaximizingPlayer) {
       let bestScore = -Infinity;
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
+      for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
           if (board[i][j] === "") {
             board[i][j] = opositePlayer;
-            let score = minimax(board, depth + 1, false);
+            let score = minimax(board, depth + 1, alpha, beta, false, size, startTime);
             board[i][j] = "";
             bestScore = Math.max(score, bestScore);
+            alpha = Math.max(alpha, bestScore);
+            if (beta <= alpha) {
+              break;
+            }
           }
         }
       }
       return bestScore;
     } else {
       let bestScore = Infinity;
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
+      for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
           if (board[i][j] === "") {
             board[i][j] = player;
-            let score = minimax(board, depth + 1, true);
+            let score = minimax(board, depth + 1, alpha, beta, true, size, startTime);
             board[i][j] = "";
             bestScore = Math.min(score, bestScore);
+            beta = Math.min(beta, bestScore);
+            if (beta <= alpha) {
+              break;
+            }
           }
         }
       }
@@ -77,20 +92,24 @@ const InGameWithAI = ({ PlayerName }) => {
     }
   };
 
-  const findBestMove = (board) => {
-    let bestVal = -1000;
+  const findBestMove = (board, size) => {
+    let bestVal = -Infinity;
     let bestMove = { i: -1, j: -1 };
+    let alpha = -Infinity;
+    let beta = Infinity;
+    const startTime = new Date();
 
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
         if (board[i][j] === "") {
           board[i][j] = opositePlayer;
-          let moveVal = minimax(board, 0, false);
+          let moveVal = minimax(board, 0, alpha, beta, false, size, startTime);
           board[i][j] = "";
           if (moveVal > bestVal) {
             bestMove = { i, j };
             bestVal = moveVal;
           }
+          alpha = Math.max(alpha, bestVal);
         }
       }
     }
@@ -99,11 +118,16 @@ const InGameWithAI = ({ PlayerName }) => {
   };
 
   const aiMove = () => {
-    let move = findBestMove(gameState);
+    let move = findBestMove(gameState, size);
     let newGameState = [...gameState];
     newGameState[move.i][move.j] = opositePlayer;
     setGameState(newGameState);
-    const winner = checkWinner(newGameState, setWinner, setWinnerwinnerMessage);
+    const winner = checkWinner(
+      newGameState,
+      setWinner,
+      setWinnerwinnerMessage,
+      size
+    );
     if (!winner && !isBoardFull(newGameState)) {
       setIsPlayerTurn(true);
       setIsOpponentTurn(false);
@@ -116,12 +140,10 @@ const InGameWithAI = ({ PlayerName }) => {
       newGameState[row][col] = player;
       setGameState(newGameState);
 
-      if (!checkWinner(newGameState, setWinner, setWinnerwinnerMessage)) {
+      if (!checkWinner(newGameState, setWinner, setWinnerwinnerMessage, size)) {
         setIsPlayerTurn(false);
         setIsOpponentTurn(true);
-        setTimeout(() => {
-          aiMove();
-        }, 1000);
+        aiMove();
       }
     }
   };
@@ -138,17 +160,7 @@ const InGameWithAI = ({ PlayerName }) => {
     });
 
     console.log("Game saved to firebase");
-    // alert("winner is " + winnerMessage + "\nBack to main menu");
     setOpenSnackbar(true);
-    // window.location.href = "/";
-  };
-
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenSnackbar(false);
   };
 
   useEffect(() => {
@@ -166,80 +178,29 @@ const InGameWithAI = ({ PlayerName }) => {
   return (
     <div className={classGame.InGame}>
       <div className={classGame.header}>
-        <div>
-          <h3
-            style={{
-              color: isPlayerTurn ? "white" : isOpponentTurn ? "gray" : "white",
-            }}
-          >
-            X
-          </h3>
-          <p
-            style={{
-              color: isPlayerTurn ? "white" : isOpponentTurn ? "gray" : "white",
-            }}
-          >
-            {playerNames}
-          </p>
-        </div>
-        <div>
-          <h3
-            style={{
-              color: isPlayerTurn ? "gray" : isOpponentTurn ? "white" : "white",
-            }}
-          >
-            O
-          </h3>
-          <p
-            style={{
-              color: isPlayerTurn ? "gray" : isOpponentTurn ? "white" : "white",
-            }}
-          >
-            AI
-          </p>
-        </div>
+        <HeaderContainer
+          name1={playerNames}
+          name2="AI"
+          isPlayerTurn={isPlayerTurn}
+          isOpponentTurn={isOpponentTurn}
+          player={player}
+        />
       </div>
-      <table>
-        <tbody>
-          {gameState.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {row.map((cell, colIndex) => (
-                <td
-                  key={colIndex}
-                  style={{
-                    border: `6px solid ${
-                      isPlayerTurn ? "white" : "transparent"
-                    }`,
-                  }}
-                >
-                  <input
-                    type="button"
-                    value={cell}
-                    id={`Slot${rowIndex * 3 + colIndex + 1}`}
-                    onClick={(e) => handlePlayerClick(e, rowIndex, colIndex)}
-                  ></input>
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ShowGameState
+        gameState={gameState}
+        handlePlayerClick={handlePlayerClick}
+        isPlayerTurn={isPlayerTurn}
+      />
       <br />
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="success"
-          sx={{ width: "100%", backgroundColor: "black", color: "white" }}
-        >
-          {winnerMessage == "tie"
+      <SnackbarContainer
+        title={
+          winnerMessage == "tie"
             ? "It's a tie"
-            : `${winnerMessage == "O" ? "AI" : playerNames} won`}
-        </Alert>
-      </Snackbar>
+            : `${winnerMessage == "O" ? "AI" : playerNames} won`
+        }
+        Duration={2000}
+        open={openSnackbar}
+      />
       {winner ? (
         <div>
           <h3

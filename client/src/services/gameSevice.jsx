@@ -3,9 +3,9 @@ import { Socket } from "socket.io-client";
 var roomIDCurrect;
 
 class GameService {
-  async joinRoom(socket, roomId) {
+  async joinRoom(socket, roomId, size) {
     return new Promise((resolve, reject) => {
-      socket.emit("join_game", { roomId});
+      socket.emit("join_game", { roomId, size });
       roomIDCurrect = roomId;
       socket.on("join_room_success", () => {
         resolve(true);
