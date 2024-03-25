@@ -1,3 +1,5 @@
+import { storage } from "../../confic/firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 
 export const copyToClipboard = (roomId, setCopySuccess) => {
   navigator.clipboard.writeText(roomId);
@@ -7,7 +9,6 @@ export const copyToClipboard = (roomId, setCopySuccess) => {
     setCopySuccess("");
   }, 1000);
 };
-
 
 export const isBoardFull = (board) => {
   for (let i = 0; i < board.length; i++) {
@@ -19,7 +20,6 @@ export const isBoardFull = (board) => {
   }
   return true;
 };
-
 
 export const checkWinner = (gameState, setWinner, setWinnerwinnerMessage) => {
   const lines = [
@@ -89,7 +89,6 @@ export const checkWinner = (gameState, setWinner, setWinnerwinnerMessage) => {
   return null;
 };
 
-
 export const formatTime = (seconds) => {
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
@@ -98,4 +97,30 @@ export const formatTime = (seconds) => {
   const pad = (num) => (num < 10 ? "0" + num : num);
 
   return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
-}
+};
+
+export const handleWatchVideo = async (
+  player1,
+  player2,
+  setVideoUrl,
+  setisVideoPlay
+) => {
+  const videoUrl = await getVideoUrl(player1, player2);
+  if (videoUrl) {
+    setVideoUrl(videoUrl);
+    setisVideoPlay(true);
+  } else {
+    alert("No video found");
+  }
+};
+
+const getVideoUrl = async (player1, player2) => {
+  try {
+    const videoRef = ref(storage, `video/${player1}VS${player2}`);
+    const url = await getDownloadURL(videoRef);
+    return url;
+  } catch (error) {
+    console.log("Error getting video url", error);
+    return null;
+  }
+};

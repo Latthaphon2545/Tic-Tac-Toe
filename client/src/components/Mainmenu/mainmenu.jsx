@@ -13,8 +13,11 @@ import InGame from "../Game/gameWithoutAI";
 import classMain from "./main.module.css";
 import InGameWithAI from "../Game/gameWithAI";
 
-import { db } from "../../confic/firebase";
+import { handleWatchVideo } from "../useTogether/useTogether";
+
+import { db, storage } from "../../confic/firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { ref, getDownloadURL } from "firebase/storage";
 
 const historyCollection = collection(db, "history");
 
@@ -23,6 +26,8 @@ const Main = () => {
   const [isPlayWithAI, setPlayWithAI] = useState(false);
   const [isHistoryUI, setHistoryUI] = useState(false);
   const [PlayerName, setPlayerName] = useState("");
+  const [isVideoPlay, setisVideoPlay] = useState(false);
+  const [videoUrl, setVideoUrl] = useState(null);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const date = new Date();
@@ -58,21 +63,9 @@ const Main = () => {
     setSelectedDate(event.target.value);
   };
 
-  const convertDate = (date) => {
-    const d = date.toDate();
-    if (isNaN(d.getTime())) {
-      // date is not valid
-      return "Invalid date";
-    } else {
-      // date is valid
-      return d.toDateString();
-    }
-  };
-
   useEffect(() => {
     connectToSocket();
     setPlayerName(randomName());
-    getInfo();
   }, []);
 
   const randomName = () => {
@@ -154,7 +147,10 @@ const Main = () => {
       {!isInRoom && !isPlayWithAI && (
         <button
           className={classMain.historybutton}
-          onClick={() => setHistoryUI(!isHistoryUI)}
+          onClick={() => {
+            setHistoryUI(!isHistoryUI);
+            getInfo();
+          }}
         >
           <img
             src={HistoryImg}
@@ -180,7 +176,6 @@ const Main = () => {
               </div>
               {history
                 .filter((game) => {
-                  // If a date is selected, only show games from that date
                   if (selectedDate) {
                     const gameDate = new Date(game.date.toDate());
                     const gameDateString = `${gameDate.getFullYear()}-${String(
@@ -217,6 +212,30 @@ const Main = () => {
                       <p>👑</p>
                       <p>{game.winner ? `${game.winner}` : "Draw"}</p>
                       <p>time for play : {game.timeToplay}</p>
+                      {game.player2 === "AI" ? (
+                      <button
+                        onClick={() =>
+                          handleWatchVideo(
+                            game.player1,
+                            game.player2,
+                            setVideoUrl,
+                            setisVideoPlay
+                          )
+                        }
+                      >
+                        Watch Video
+                      </button>
+                    ) : null}
+                      {isVideoPlay ? (
+                        <>
+                          <div className={classMain.videoContainer}>
+                            <video src={videoUrl} controls autoPlay />
+                            <button onClick={() => setisVideoPlay(false)}>
+                              Back
+                            </button>
+                          </div>
+                        </>
+                      ) : null}
                     </div>
                   </div>
                 ))}

@@ -8,6 +8,7 @@ import Alert from "@mui/material/Alert";
 import classGame from "./game.module.css";
 
 import { copyToClipboard, checkWinner } from "../useTogether/useTogether";
+import ScreenRecorder from "../../record/vedio";
 
 const socketServices = new SocketServices();
 const gameService = new GameService();

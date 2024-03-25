@@ -115,6 +115,17 @@ body {
     text-align: center;
 }
 
+.winner button{
+    cursor: pointer;
+    background-color: transparent;
+    color: #ffffff;
+    border: none;
+    margin-top: 10px;
+    font-size: 20px;
+    text-decoration: underline;
+    text-shadow: 1px 1px 3px #000000;
+}
+
 .date {
     display: flex;
     justify-content: center;
@@ -140,30 +151,34 @@ input[type="date"]:hover {
     background-color: #645F5B;
 }
 
-/* The snackbar - position it at the bottom and in the middle of the screen */
-#snackbar {
-    visibility: hidden;
-    /* Hidden by default. Visible on click */
-    min-width: 250px;
-    /* Set a default minimum width */
-    margin-left: -125px;
-    /* Divide value of min-width by 2 */
-    background-color: #333;
-    /* Black background color */
-    color: #fff;
-    /* White text color */
-    text-align: center;
-    /* Centered text */
-    border-radius: 2px;
-    /* Rounded borders */
-    padding: 16px;
-    /* Padding */
+.videoContainer video {
+    width: 80%;
+    height: 80%;
+    border-radius: 20px;
+}
+
+.videoContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     position: fixed;
-    /* Sit on top of the screen */
-    z-index: 1;
-    /* Add a z-index if needed */
+    top: 50%;
     left: 50%;
-    /* Center the snackbar */
-    bottom: 30px;
-    /* 30px from the bottom */
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    background-color: #FFF2DC;
+    border-radius: 20px;
+    box-shadow: 2px 5px 0 #3d3b3b;
+}
+
+.videoContainer button{
+    cursor: pointer;
+    background-color: transparent;
+    color: #645F5B;
+    border: none;
+    margin-top: 10px;
+    font-size: 20px;
+    text-decoration: underline;
+    text-shadow: none;
 }

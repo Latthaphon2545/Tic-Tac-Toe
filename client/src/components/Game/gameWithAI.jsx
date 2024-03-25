@@ -13,6 +13,7 @@ import {
 } from "../useTogether/useTogether";
 
 import classGame from "./game.module.css";
+import ScreenRecorder from "../../record/vedio";
 
 const InGameWithAI = ({ PlayerName }) => {
   const [player, setPlayer] = useState("X");
@@ -251,6 +252,7 @@ const InGameWithAI = ({ PlayerName }) => {
           </h3>
         </div>
       ) : null}
+      <ScreenRecorder PlayerName={`${PlayerName}VSAI`} winner={winner} />
     </div>
   );
 };
