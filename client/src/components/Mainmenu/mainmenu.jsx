@@ -123,28 +123,34 @@ const Main = () => {
 
   return (
     <div className={`${classMain.Main}`}>
-      <div>
+      <div className={`${classMain.Main}`}>
         {!isInRoom && !isPlayWithAI && (
           <>
             <h1>Tic Tac Toe</h1>
+            <label>Name</label>
             <input
               type="text"
               placeholder="Enter Name"
               onChange={(e) => setPlayerName(e.target.value || randomName())}
             />
+            <label>Border Size</label>
             <input
               type="number"
               placeholder="Enter Board Size"
               value={size}
               onChange={(e) => setSize(parseInt(e.target.value))}
+              max={6}
+              min={3}
             />
           </>
         )}
         <GameContext.Provider
           value={{ isInRoom, setInRoom, isPlayWithAI, setPlayWithAI }}
         >
-          {!isInRoom & !isPlayWithAI && <JoinRoom disabled={!PlayerName} size={size} />}
-          {isInRoom && <InGame PlayerName={PlayerName}/>}
+          {!isInRoom & !isPlayWithAI && (
+            <JoinRoom disabled={!PlayerName} size={size} />
+          )}
+          {isInRoom && <InGame PlayerName={PlayerName} />}
           {isPlayWithAI && <InGameWithAI PlayerName={PlayerName} size={size} />}
         </GameContext.Provider>
       </div>
