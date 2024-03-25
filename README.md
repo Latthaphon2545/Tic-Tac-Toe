@@ -18,7 +18,7 @@
 
 
 ## Demo
-https://github.com/Latthaphon2545/Tic-Tac-Toe/assets/108315515/e07b276d-1a11-442c-9552-31e4488a4240
+https://github.com/Latthaphon2545/Tic-Tac-Toe/assets/108315515/7c6036f6-51e0-4a68-8cf8-0edc524a1e8c
 
 
 ## About the Game
